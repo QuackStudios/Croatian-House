@@ -211,7 +211,7 @@ html {
 }
 body {
   color: #333;
-  background-color: #fff;
+  background-color: #fdfdfd;
   min-height: 100%;
   margin: 0;
   font-family: Arial, sans-serif;
@@ -1800,31 +1800,31 @@ textarea.w-select {
 }
 @font-face {
   font-family: Brown;
-  src: url(../fonts/pb1onqBA95v5.woff2) format("woff2");
+  src: url(../fonts/sAgX51J6KXhE.woff2) format("woff2");
   font-weight: 400;
   font-style: normal;
   font-display: block;
 }
 @font-face {
   font-family: Suisse Intl;
-  src: url(../fonts/MyO5cJP9eQEA.woff2) format("woff2");
+  src: url(../fonts/736qxCkNcLz5.woff2) format("woff2");
   font-weight: 400;
   font-style: normal;
   font-display: block;
 }
 :root {
-  --black: black;
-  --grey: #eee8e6;
-  --white: white;
+  --black: #121212;
+  --grey: #ededed;
+  --white: #fdfdfd;
   --xmas-2025: #fcf5e9;
-  --red: #e06660;
+  --red: #a5c2b6;
   --orange: #e48f34;
   --green-dark: #202d22;
-  --green: #9bb6a4;
+  --green: #c9c9c9;
   --purple: #3f3441;
-  --pink: #f2bdb1;
-  --teal: #439293;
-  --yellow: #f0d36f;
+  --pink: #787878;
+  --teal: #B0A9A0;
+  --yellow: #bdc6d1;
 }
 .w-layout-blockcontainer {
   max-width: 940px;
@@ -2024,7 +2024,7 @@ figure {
 .section.xmas.xmas-area.bar {
   background-color: #e2d6bc;
 }
-.section.xmas.xmas-area.bar.trickle {
+.section.xmas.xmas-area.bar.founders-foyer {
   margin-top: 0;
   margin-bottom: 112px;
 }
@@ -2187,9 +2187,9 @@ figure {
 }
 .nav__logo {
   z-index: 1;
-  width: 6em;
+  width: 16em;
   height: 3.1em;
-  margin-left: -3em;
+  margin-left: -8em;
   position: absolute;
   top: 0.8em;
   left: 50vw;
@@ -2202,13 +2202,13 @@ figure {
 }
 .footer {
   background-color: var(--grey);
-  padding: 48px 48px 24px;
+  padding: 0px 48px 24px;
 }
 .footer__logo {
   object-fit: contain;
-  width: 32em;
-  height: 3.04644em;
-  margin-bottom: 18em;
+  width: 26em;
+  height: 8em;
+  margin-bottom: 8em;
 }
 .footer__wrp {
   grid-column-gap: 1.5em;
@@ -2266,7 +2266,7 @@ figure {
 }
 .location__heading {
   margin-bottom: -0.15em;
-  font-size: 4.209em;
+  font-size: 3.209em;
   line-height: 1;
 }
 .location__img {
@@ -3222,7 +3222,7 @@ figure {
     border-bottom-style: solid;
     margin-top: 0;
   }
-  .section.xmas.xmas-area.bar.trickle {
+  .section.xmas.xmas-area.bar.founders-foyer {
     margin-bottom: 0;
   }
   .style-grid {
