@@ -189,38 +189,199 @@
     </style>
   </head>
   <body>
-    <div class="transition">
-      <div class="transition__trigger"></div>
-      <div class="transition__b w-embed">
-        <!--?xml version="1.0" encoding="UTF-8"?--><svg
-          id="b"
+    <style>
+  .transition__custom-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    color: currentColor;
+  }
+
+  .transition__custom-lockup {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform-origin: center;
+    opacity: 1;
+    transform: translateZ(0) scale(1);
+    filter: blur(0);
+    will-change: transform, opacity, filter;
+    backface-visibility: hidden;
+  }
+
+  .transition.is-arriving .transition__custom-lockup {
+    animation: chLogoArrival 1550ms cubic-bezier(0.77, 0, 0.175, 1) both;
+  }
+
+  .transition.is-leaving .transition__custom-lockup {
+    animation: chLogoExit 900ms cubic-bezier(0.77, 0, 0.175, 1) 300ms both;
+  }
+
+  .transition__custom-icon {
+    width: clamp(104px, 11vw, 180px);
+    height: auto;
+    display: block;
+    color: currentColor;
+    transform-origin: center;
+    will-change: transform, opacity, filter;
+  }
+
+  .transition__custom-icon svg {
+    width: 100%;
+    height: auto;
+    display: block;
+    overflow: visible;
+  }
+
+  .transition__custom-icon path {
+    fill: currentColor !important;
+  }
+
+  /*
+    EXIT / LEAVING PAGE:
+    The overlay is sliding up from below.
+    The 300ms animation delay above means the logo starts animating when the panel is actually becoming visible.
+  */
+  @keyframes chLogoExit {
+    0% {
+      opacity: 0;
+      transform: translateZ(0) scale(0.82);
+      filter: blur(14px);
+    }
+
+    38% {
+      opacity: 0.48;
+      transform: translateZ(0) scale(0.92);
+      filter: blur(6px);
+    }
+
+    74% {
+      opacity: 1;
+      transform: translateZ(0) scale(1.035);
+      filter: blur(0);
+    }
+
+    100% {
+      opacity: 1;
+      transform: translateZ(0) scale(1);
+      filter: blur(0);
+    }
+  }
+
+  /*
+    ARRIVAL / NEW PAGE:
+    Logo starts sharp because the overlay is already covering the new page.
+    It holds, then fades/blurs/zooms down as the overlay leaves.
+  */
+  @keyframes chLogoArrival {
+    0% {
+      opacity: 1;
+      transform: translateZ(0) scale(1);
+      filter: blur(0);
+    }
+
+    40% {
+      opacity: 1;
+      transform: translateZ(0) scale(1);
+      filter: blur(0);
+    }
+
+    72% {
+      opacity: 0.42;
+      transform: translateZ(0) scale(0.94);
+      filter: blur(4px);
+    }
+
+    100% {
+      opacity: 0;
+      transform: translateZ(0) scale(0.86);
+      filter: blur(14px);
+    }
+  }
+
+  @media screen and (max-width: 767px) {
+    .transition__custom-icon {
+      width: clamp(84px, 28vw, 128px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .transition.is-arriving .transition__custom-lockup,
+    .transition.is-leaving .transition__custom-lockup {
+      animation: none;
+    }
+  }
+</style>
+
+<div class="transition is-arriving">
+  <div class="transition__trigger"></div>
+
+  <!-- Invisible Webflow hooks. Do not delete these unless you also edit the Webflow animation JSON. -->
+  <div
+    class="transition__b w-embed"
+    style="
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      overflow: hidden;
+      pointer-events: none;
+    "
+  ></div>
+
+  <div
+    class="transition__line"
+    style="
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      overflow: hidden;
+      pointer-events: none;
+    "
+  ></div>
+
+  <div
+    class="transition__t w-embed"
+    style="
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      overflow: hidden;
+      pointer-events: none;
+    "
+  ></div>
+
+  <!-- CH logo only -->
+  <div class="transition__custom-layer">
+    <div class="transition__custom-lockup">
+      <div class="transition__custom-icon" aria-hidden="true">
+        <svg
           xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 85.5 119.8"
+          viewBox="0 0 141 187"
+          preserveAspectRatio="xMidYMid meet"
         >
-          <g id="c">
+          <g transform="translate(0.272845 135.053429)">
             <path
-              d="m0,119.7V0h40.7c11.6,0,19,3.3,24.6,8.4,6.2,5.6,9.9,13.9,9.9,22.8,0,8.2-3.8,16.1-9.4,21.4,11.3,5.6,19.7,18,19.7,31.5,0,11.1-5.1,21.2-13.2,27.7-6.2,5.1-14,8-26.2,8H0v-.1ZM37.7,47c9.6,0,13.7-1.9,16.4-5,2.6-2.7,4.1-6.3,4.1-10.4s-1.5-7.7-4.1-10.4c-2.7-3.1-6.8-5-16.4-5h-20.6v30.8s20.6,0,20.6,0Zm5.4,56.5c10.8,0,15.9-2.4,19.7-6.2,3.4-3.6,5.6-8.6,5.6-14s-2.2-10.3-5.6-13.9c-3.8-3.8-8.9-6.2-19.7-6.2h-26v40.2h26v.1Z"
-              style="stroke-width: 0px; fill: currentColor"
+              d="M 58.265625 1.59375 C 51.015625 1.59375 44.269531 0.265625 38.03125 -2.390625 C 31.789062 -5.046875 26.320312 -8.738281 21.625 -13.46875 C 16.9375 -18.207031 13.3125 -23.695312 10.75 -29.9375 C 8.1875 -36.175781 6.90625 -42.878906 6.90625 -50.046875 C 6.90625 -57.210938 8.1875 -63.914062 10.75 -70.15625 C 13.3125 -76.394531 16.9375 -81.878906 21.625 -86.609375 C 26.320312 -91.335938 31.789062 -95.03125 38.03125 -97.6875 C 44.269531 -100.34375 51.015625 -101.671875 58.265625 -101.671875 C 64.109375 -101.671875 69.570312 -100.785156 74.65625 -99.015625 C 79.75 -97.242188 84.421875 -94.769531 88.671875 -91.59375 L 88.671875 -82.296875 C 84.679688 -86.015625 80.117188 -88.910156 74.984375 -90.984375 C 69.859375 -93.066406 64.285156 -94.109375 58.265625 -94.109375 C 52.160156 -94.109375 46.472656 -93 41.203125 -90.78125 C 35.941406 -88.570312 31.34375 -85.453125 27.40625 -81.421875 C 23.46875 -77.398438 20.390625 -72.734375 18.171875 -67.421875 C 15.960938 -62.117188 14.859375 -56.328125 14.859375 -50.046875 C 14.859375 -43.847656 15.960938 -38.070312 18.171875 -32.71875 C 20.390625 -27.363281 23.46875 -22.671875 27.40625 -18.640625 C 31.34375 -14.617188 35.941406 -11.5 41.203125 -9.28125 C 46.472656 -7.070312 52.160156 -5.96875 58.265625 -5.96875 C 64.285156 -5.96875 69.859375 -7.007812 74.984375 -9.09375 C 80.117188 -11.175781 84.679688 -14.070312 88.671875 -17.78125 L 88.671875 -8.5 C 84.421875 -5.3125 79.75 -2.832031 74.65625 -1.0625 C 69.570312 0.707031 64.109375 1.59375 58.265625 1.59375 Z M 58.265625 1.59375"
             ></path>
           </g>
-        </svg>
-      </div>
-      <div class="transition__line"></div>
-      <div class="transition__t w-embed">
-        <!--?xml version="1.0" encoding="UTF-8"?--><svg
-          id="b"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 82.1 119.8"
-        >
-          <g id="c">
+
+          <g transform="translate(35.439933 151.57338)">
             <path
-              d="m0,0h82.1v16.3h-32.5v103.5h-17.1V16.2H0V0Z"
-              style="stroke-width: 0px; fill: currentColor"
+              d="M 22.03125 -100.078125 L 22.03125 -57.609375 L 77.25 -57.609375 L 77.25 -100.078125 L 85.21875 -100.078125 L 85.21875 0 L 77.25 0 L 77.25 -50.046875 L 22.03125 -50.046875 L 22.03125 0 L 14.0625 0 L 14.0625 -100.078125 Z M 22.03125 -100.078125"
             ></path>
           </g>
         </svg>
       </div>
     </div>
+  </div>
+</div>
     <header class="nav">
       <a transition="pink" href="/contact" class="nav__btn w-inline-block"
         ><div class="nav__btn__txt">Enquire</div>
@@ -1101,5 +1262,86 @@
       const url = "https://founders-foyerlondon.co.uk".replace("https://", "");
       links[0].innerHTML = url;
     </script>
+
+    
+
+    <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const transition = document.querySelector(".transition");
+    const lockup = document.querySelector(".transition__custom-lockup");
+    const trigger = document.querySelector(".transition__trigger");
+
+    if (!transition || !lockup) return;
+
+    let leavingStarted = false;
+
+    function restartLogoAnimation(stateClass) {
+      transition.classList.remove("is-arriving", "is-leaving");
+
+      lockup.style.animation = "none";
+      void lockup.offsetHeight;
+      lockup.style.animation = "";
+
+      transition.classList.add(stateClass);
+    }
+
+    function startLeavingAnimation() {
+      if (leavingStarted) return;
+      leavingStarted = true;
+
+      restartLogoAnimation("is-leaving");
+    }
+
+    if (trigger) {
+      trigger.addEventListener("click", startLeavingAnimation, true);
+    }
+
+    document.addEventListener(
+      "click",
+      function (event) {
+        if (event.defaultPrevented) return;
+        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        if (event.button && event.button !== 0) return;
+
+        const link = event.target.closest && event.target.closest("a[href]");
+        if (!link) return;
+
+        const href = link.getAttribute("href");
+        if (!href) return;
+
+        if (
+          link.target === "_blank" ||
+          link.hasAttribute("download") ||
+          href.startsWith("#") ||
+          href.startsWith("mailto:") ||
+          href.startsWith("tel:")
+        ) {
+          return;
+        }
+
+        try {
+          const url = new URL(href, window.location.href);
+          const current = new URL(window.location.href);
+
+          const isSameSite = url.origin === current.origin;
+          const isSamePageAnchor =
+            url.pathname === current.pathname && url.hash && url.hash !== "";
+
+          if (isSameSite && !isSamePageAnchor) {
+            startLeavingAnimation();
+          }
+        } catch (error) {}
+      },
+      true
+    );
+
+    window.addEventListener("pageshow", function (event) {
+      if (event.persisted) {
+        leavingStarted = false;
+        restartLogoAnimation("is-arriving");
+      }
+    });
+  });
+</script>
   </body>
 </html>
