@@ -1104,10 +1104,27 @@
       >
         <div class="ch-honeypot" aria-hidden="true">
           <label>Leave this field empty</label>
-          <input type="text" name="website" tabindex="-1" autocomplete="off">
+          <input
+            type="text"
+            id="website"
+            name="website"
+            tabindex="-1"
+            autocomplete="off"
+          >
+
+          <label>Company website</label>
+          <input
+            type="text"
+            id="company_website"
+            name="company_website"
+            tabindex="-1"
+            autocomplete="off"
+          >
         </div>
 
         <!-- Hidden fields for Zapier / HoneyBook -->
+        <input type="hidden" name="form_started_at" id="form_started_at" value="">
+        <input type="hidden" name="time_on_page_seconds" id="time_on_page_seconds" value="">  
         <input type="hidden" name="project_type" value="Venue Hire">
         <input type="hidden" name="project_location" id="project_location" value="">
         <input type="hidden" name="project_date" id="project_date" value="">
@@ -1514,309 +1531,401 @@
     </div>
   </div>
 
-  <script>
-    (function () {
-      /*
-        ZAPIER SETUP LATER:
+  
 
-        1. In Zapier, create a Zap.
-        2. Trigger: Webhooks by Zapier → Catch Hook.
-        3. Copy the Catch Hook URL.
-        4. Paste it below.
-        5. Action: HoneyBook → Create Project.
-      */
+<script>
+  (function () {
+    /*
+      ZAPIER SETUP:
 
-      const ZAPIER_WEBHOOK_URL = "https://hooks.zapier.com/hooks/catch/28074292/42f76vz/";
+      Current flow should be:
+      1. Webhooks by Zapier → Catch Hook
+      2. Filter by Zapier → spam/basic validation gate
+      3. HoneyBook → Create Project
+      4. Gmail → Send Email confirmation to client
+    */
 
-      const form = document.getElementById("croatianVenueForm");
-      const submitButton = document.getElementById("chSubmitButton");
-      const success = document.getElementById("chSuccess");
-      const zapierWarning = document.getElementById("chZapierWarning");
-      const progressFill = document.getElementById("chProgressFill");
-      const charCount = document.getElementById("chCharCount");
-      const consentBox = document.getElementById("consentBox");
+    const ZAPIER_WEBHOOK_URL = "https://hooks.zapier.com/hooks/catch/28074292/42f76vz/";
 
-      const projectLocation = document.getElementById("project_location");
-      const projectDate = document.getElementById("project_date");
-      const projectDetails = document.getElementById("project_details");
-      const submittedAt = document.getElementById("submitted_at");
+    const form = document.getElementById("croatianVenueForm");
+    const submitButton = document.getElementById("chSubmitButton");
+    const success = document.getElementById("chSuccess");
+    const zapierWarning = document.getElementById("chZapierWarning");
+    const progressFill = document.getElementById("chProgressFill");
+    const charCount = document.getElementById("chCharCount");
+    const consentBox = document.getElementById("consentBox");
 
-      const summaryVenue = document.getElementById("summaryVenue");
-      const summaryType = document.getElementById("summaryType");
-      const summaryDate = document.getElementById("summaryDate");
-      const summaryGuests = document.getElementById("summaryGuests");
+    const projectLocation = document.getElementById("project_location");
+    const projectDate = document.getElementById("project_date");
+    const projectDetails = document.getElementById("project_details");
+    const submittedAt = document.getElementById("submitted_at");
 
+    const formStartedAt = document.getElementById("form_started_at");
+    const timeOnPageSeconds = document.getElementById("time_on_page_seconds");
+
+    const summaryVenue = document.getElementById("summaryVenue");
+    const summaryType = document.getElementById("summaryType");
+    const summaryDate = document.getElementById("summaryDate");
+    const summaryGuests = document.getElementById("summaryGuests");
+
+    let formStartTimestamp = Date.now();
+
+    if (formStartedAt) {
+      formStartedAt.value = new Date(formStartTimestamp).toISOString();
+    }
+
+    if (form) {
       form.action = ZAPIER_WEBHOOK_URL;
+    }
 
-      const requiredSelectors = [
-        "#client_full_name",
-        "#client_email",
-        "#phone_number",
-        "#event_type",
-        "#event_date",
-        "#guest_count",
-        "#contact_consent"
-      ];
+    const requiredSelectors = [
+      "#client_full_name",
+      "#client_email",
+      "#phone_number",
+      "#event_type",
+      "#event_date",
+      "#guest_count",
+      "#contact_consent"
+    ];
 
-      const requiredRadioNames = [
-        "venue_requested",
-        "open_to_other_space",
-        "date_flexible"
-      ];
+    const requiredRadioNames = [
+      "venue_requested",
+      "open_to_other_space",
+      "date_flexible"
+    ];
 
-      function getValue(nameOrId) {
-        const byId = document.getElementById(nameOrId);
+    function getValue(nameOrId) {
+      const byId = document.getElementById(nameOrId);
 
-        if (byId) {
-          if (byId.type === "checkbox") {
-            return byId.checked ? byId.value : "No";
-          }
-
-          return byId.value.trim();
+      if (byId) {
+        if (byId.type === "checkbox") {
+          return byId.checked ? byId.value : "No";
         }
 
-        const checked = form.querySelector(`[name="${nameOrId}"]:checked`);
-        return checked ? checked.value : "";
+        return String(byId.value || "").trim();
       }
 
-      function setFieldError(field, hasError) {
-        if (!field) return;
-        field.classList.toggle("is-error", hasError);
-      }
+      const checked = form.querySelector(`[name="${nameOrId}"]:checked`);
+      return checked ? checked.value : "";
+    }
 
-      function isValidEmail(email) {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-      }
+    function setFieldError(field, hasError) {
+      if (!field) return;
+      field.classList.toggle("is-error", hasError);
+    }
 
-      function formatDateForHumans(yyyyMmDd) {
-        if (!yyyyMmDd) return "";
+    function isValidEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
 
-        const parts = yyyyMmDd.split("-");
-        const year = parts[0];
-        const month = parts[1];
-        const day = parts[2];
+    function formatDateForHumans(yyyyMmDd) {
+      if (!yyyyMmDd) return "";
 
-        if (!year || !month || !day) return yyyyMmDd;
+      const parts = yyyyMmDd.split("-");
+      const year = parts[0];
+      const month = parts[1];
+      const day = parts[2];
 
-        return `${day}/${month}/${year}`;
-      }
+      if (!year || !month || !day) return yyyyMmDd;
 
-      
- function escapeHtml(value) {
-  return String(value || "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
+      return `${day}/${month}/${year}`;
+    }
 
-function buildProjectDetails() {
-  const otherSpace = getValue("open_to_other_space");
-  const eventType = getValue("event_type");
-  const dateFlexible = getValue("date_flexible");
-  const guestCount = getValue("guest_count");
-  const preferredContact = getValue("preferred_contact_method");
-  const bestContactTime = getValue("best_contact_time");
-  const marketingConsent = getValue("marketing_consent");
-  const notes = getValue("event_notes");
+    function buildProjectDetails() {
+      const otherSpace = getValue("open_to_other_space");
+      const eventType = getValue("event_type");
+      const dateFlexible = getValue("date_flexible");
+      const guestCount = getValue("guest_count");
+      const preferredContact = getValue("preferred_contact_method");
+      const bestContactTime = getValue("best_contact_time");
+      const marketingConsent = getValue("marketing_consent");
+      const notes = getValue("event_notes");
 
-  /*
-    HoneyBook strips real layout and displays this inside one bold inline span.
-    So this must be written as a clean inline summary, not fake rows.
-  */
+      /*
+        HoneyBook strips proper layout in Project Details.
+        This compact version avoids ugly fake rows/lines and keeps it readable.
+        Venue/date/name/email/phone are NOT repeated here because HoneyBook already
+        displays those separately via project location/date/client fields.
+      */
 
-  return [
-    "EVENT DETAILS",
-    `Event type: ${eventType || "Not selected"}`,
-    `Date flexible: ${dateFlexible || "Not specified"}`,
-    `Guest count: ${guestCount || "Not selected"}`,
-    `Open to another space: ${otherSpace || "Not specified"}`,
+      return [
+        "EVENT DETAILS",
+        `Event type: ${eventType || "Not selected"}`,
+        `Date flexible: ${dateFlexible || "Not specified"}`,
+        `Guest count: ${guestCount || "Not selected"}`,
+        `Open to another space: ${otherSpace || "Not specified"}`,
 
-    "CONTACT PREFERENCE",
-    `Preferred contact: ${preferredContact || "Not specified"}`,
-    `Best time: ${bestContactTime || "Not specified"}`,
+        "CONTACT PREFERENCE",
+        `Preferred contact: ${preferredContact || "Not specified"}`,
+        `Best time: ${bestContactTime || "Not specified"}`,
 
-    "CONSENT",
-    `Marketing consent: ${marketingConsent || "No"}`,
+        "CONSENT",
+        `Marketing consent: ${marketingConsent || "No"}`,
 
-    "CLIENT MESSAGE",
-    notes || "No additional message provided."
-  ].join("   |   ");
-}
+        "CLIENT MESSAGE",
+        notes || "No additional message provided."
+      ].join("   |   ");
+    }
 
-      function syncHiddenHoneyBookFields() {
-        const venue = getValue("venue_requested");
-        const date = getValue("event_date");
+    function syncHiddenHoneyBookFields() {
+      const venue = getValue("venue_requested");
+      const date = getValue("event_date");
 
+      if (projectLocation) {
         projectLocation.value = venue;
+      }
+
+      if (projectDate) {
         projectDate.value = date;
+      }
+
+      if (projectDetails) {
         projectDetails.value = buildProjectDetails();
+      }
+
+      if (submittedAt) {
         submittedAt.value = new Date().toISOString();
       }
 
-      function updateSummary() {
+      if (timeOnPageSeconds) {
+        timeOnPageSeconds.value = Math.round((Date.now() - formStartTimestamp) / 1000);
+      }
+
+      if (formStartedAt && !formStartedAt.value) {
+        formStartedAt.value = new Date(formStartTimestamp).toISOString();
+      }
+    }
+
+    function updateSummary() {
+      if (summaryVenue) {
         summaryVenue.textContent = getValue("venue_requested") || "Not selected";
+      }
+
+      if (summaryType) {
         summaryType.textContent = getValue("event_type") || "Not selected";
+      }
+
+      if (summaryDate) {
         summaryDate.textContent = formatDateForHumans(getValue("event_date")) || "Not selected";
+      }
+
+      if (summaryGuests) {
         summaryGuests.textContent = getValue("guest_count") || "Not selected";
       }
+    }
 
-      function updateProgress() {
-        let completed = 0;
-        const total = requiredSelectors.length + requiredRadioNames.length;
+    function updateProgress() {
+      let completed = 0;
+      const total = requiredSelectors.length + requiredRadioNames.length;
 
-        requiredSelectors.forEach((selector) => {
-          const el = form.querySelector(selector);
-          if (!el) return;
+      requiredSelectors.forEach((selector) => {
+        const el = form.querySelector(selector);
+        if (!el) return;
 
-          if (el.type === "checkbox") {
-            if (el.checked) completed += 1;
-            return;
-          }
+        if (el.type === "checkbox") {
+          if (el.checked) completed += 1;
+          return;
+        }
 
-          if (el.type === "email") {
-            if (isValidEmail(el.value.trim())) completed += 1;
-            return;
-          }
+        if (el.type === "email") {
+          if (isValidEmail(el.value.trim())) completed += 1;
+          return;
+        }
 
-          if (el.value.trim()) completed += 1;
-        });
+        if (el.value.trim()) completed += 1;
+      });
 
-        requiredRadioNames.forEach((name) => {
-          if (form.querySelector(`[name="${name}"]:checked`)) {
-            completed += 1;
-          }
-        });
+      requiredRadioNames.forEach((name) => {
+        if (form.querySelector(`[name="${name}"]:checked`)) {
+          completed += 1;
+        }
+      });
 
+      if (progressFill) {
         progressFill.style.width = `${Math.round((completed / total) * 100)}%`;
       }
+    }
 
-      function validateForm() {
-        let valid = true;
+    function validateForm() {
+      let valid = true;
 
-        requiredSelectors.forEach((selector) => {
-          const el = form.querySelector(selector);
-          if (!el) return;
+      requiredSelectors.forEach((selector) => {
+        const el = form.querySelector(selector);
+        if (!el) return;
 
-          const field = el.closest(".ch-field");
+        const field = el.closest(".ch-field");
 
-          let hasError = false;
+        let hasError = false;
 
-          if (el.type === "checkbox") {
-            hasError = !el.checked;
+        if (el.type === "checkbox") {
+          hasError = !el.checked;
+
+          if (consentBox) {
             consentBox.classList.toggle("is-error", hasError);
-          } else if (el.type === "email") {
-            hasError = !isValidEmail(el.value.trim());
-            setFieldError(field, hasError);
-          } else {
-            hasError = !el.value.trim();
-            setFieldError(field, hasError);
           }
+        } else if (el.type === "email") {
+          hasError = !isValidEmail(el.value.trim());
+          setFieldError(field, hasError);
+        } else {
+          hasError = !el.value.trim();
+          setFieldError(field, hasError);
+        }
 
-          if (hasError) valid = false;
-        });
+        if (hasError) valid = false;
+      });
 
-        requiredRadioNames.forEach((name) => {
-          const group = form.querySelector(`[data-required-radio="${name}"]`);
-          const checked = form.querySelector(`[name="${name}"]:checked`);
-          const hasError = !checked;
+      requiredRadioNames.forEach((name) => {
+        const group = form.querySelector(`[data-required-radio="${name}"]`);
+        const checked = form.querySelector(`[name="${name}"]:checked`);
+        const hasError = !checked;
 
-          setFieldError(group, hasError);
+        setFieldError(group, hasError);
 
-          if (hasError) valid = false;
-        });
+        if (hasError) valid = false;
+      });
 
-        return valid;
+      return valid;
+    }
+
+    function clearValidationErrorsOnInteraction() {
+      form.querySelectorAll(".is-error").forEach((el) => {
+        el.classList.remove("is-error");
+      });
+
+      if (consentBox) {
+        consentBox.classList.remove("is-error");
       }
+    }
 
-      form.addEventListener("input", () => {
-        syncHiddenHoneyBookFields();
-        updateSummary();
-        updateProgress();
+    form.addEventListener("input", () => {
+      syncHiddenHoneyBookFields();
+      updateSummary();
+      updateProgress();
+      clearValidationErrorsOnInteraction();
+
+      if (success) {
         success.classList.remove("is-visible");
-      });
+      }
+    });
 
-      form.addEventListener("change", () => {
-        syncHiddenHoneyBookFields();
-        updateSummary();
-        updateProgress();
+    form.addEventListener("change", () => {
+      syncHiddenHoneyBookFields();
+      updateSummary();
+      updateProgress();
+      clearValidationErrorsOnInteraction();
+
+      if (success) {
         success.classList.remove("is-visible");
-      });
+      }
+    });
 
-      const notes = document.getElementById("event_notes");
+    const notes = document.getElementById("event_notes");
 
+    if (notes && charCount) {
       notes.addEventListener("input", () => {
         charCount.textContent = notes.value.length;
       });
+    }
 
-      form.addEventListener("submit", function (event) {
+    form.addEventListener("submit", function (event) {
+      if (success) {
         success.classList.remove("is-visible");
-        zapierWarning.classList.remove("is-visible");
+      }
 
-        if (ZAPIER_WEBHOOK_URL === "PASTE_YOUR_ZAPIER_CATCH_HOOK_URL_HERE") {
-          event.preventDefault();
+      if (zapierWarning) {
+        zapierWarning.classList.remove("is-visible");
+      }
+
+      if (
+        !ZAPIER_WEBHOOK_URL ||
+        ZAPIER_WEBHOOK_URL === "PASTE_YOUR_EXISTING_ZAPIER_WEBHOOK_URL_HERE" ||
+        ZAPIER_WEBHOOK_URL === "PASTE_YOUR_ZAPIER_CATCH_HOOK_URL_HERE"
+      ) {
+        event.preventDefault();
+
+        if (zapierWarning) {
           zapierWarning.classList.add("is-visible");
           zapierWarning.scrollIntoView({ behavior: "smooth", block: "center" });
-          return;
         }
 
-        if (getValue("website")) {
-          event.preventDefault();
-          return;
+        return;
+      }
+
+      /*
+        Spam protection:
+        Real users never see or fill these fields.
+        Many spam bots fill every input they find, so if either has a value,
+        silently block the submission.
+      */
+      if (getValue("website") || getValue("company_website")) {
+        event.preventDefault();
+        return;
+      }
+
+      syncHiddenHoneyBookFields();
+
+      if (!validateForm()) {
+        event.preventDefault();
+
+        const firstError = form.querySelector(".is-error");
+
+        if (firstError) {
+          firstError.scrollIntoView({ behavior: "smooth", block: "center" });
         }
 
-        syncHiddenHoneyBookFields();
+        return;
+      }
 
-        if (!validateForm()) {
-          event.preventDefault();
+      submitButton.disabled = true;
+      submitButton.textContent = "Submitting...";
 
-          const firstError = form.querySelector(".is-error");
+      /*
+        This submits to Zapier through the hidden iframe.
+        It avoids CORS issues and keeps the user on the page.
 
-          if (firstError) {
-            firstError.scrollIntoView({ behavior: "smooth", block: "center" });
-          }
+        Important:
+        The front-end cannot truly verify that HoneyBook created the project
+        or that the Gmail confirmation email sent. Confirm that in Zapier
+        Zap history after testing.
+      */
 
-          return;
-        }
+      window.setTimeout(() => {
+        submitButton.disabled = false;
+        submitButton.textContent = "Submit Enquiry";
 
-        submitButton.disabled = true;
-        submitButton.textContent = "Submitting...";
-
-        /*
-          This submits to Zapier through a hidden iframe.
-          It avoids CORS issues and keeps the user on the page.
-
-          Important:
-          The front-end cannot truly verify that HoneyBook created the project.
-          Test the Zap once inside Zapier and confirm the project appears in HoneyBook.
-        */
-
-        window.setTimeout(() => {
-          submitButton.disabled = false;
-          submitButton.textContent = "Submit Enquiry";
-
+        if (success) {
           success.classList.add("is-visible");
           success.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
 
-          form.reset();
+        form.reset();
 
-          projectLocation.value = "";
-          projectDate.value = "";
-          projectDetails.value = "";
-          submittedAt.value = "";
+        if (projectLocation) projectLocation.value = "";
+        if (projectDate) projectDate.value = "";
+        if (projectDetails) projectDetails.value = "";
+        if (submittedAt) submittedAt.value = "";
+        if (timeOnPageSeconds) timeOnPageSeconds.value = "";
 
+        formStartTimestamp = Date.now();
+
+        if (formStartedAt) {
+          formStartedAt.value = new Date(formStartTimestamp).toISOString();
+        }
+
+        if (charCount) {
           charCount.textContent = "0";
+        }
 
-          updateSummary();
-          updateProgress();
-        }, 1300);
-      });
+        updateSummary();
+        updateProgress();
+      }, 1300);
+    });
 
-      updateSummary();
-      updateProgress();
-    })();
-  </script>
+    syncHiddenHoneyBookFields();
+    updateSummary();
+    updateProgress();
+  })();
+</script>
 </section>
 
 
