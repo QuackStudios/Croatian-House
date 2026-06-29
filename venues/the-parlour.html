@@ -424,17 +424,564 @@
           <div class="eyebrows">Cocktail</div>
           <div class="p-large">160</div>
         </div>
-        <div class="venue__features__item w-condition-invisible">
-          <div class="eyebrows">120</div>
+        <div class="venue__features__item">
+          <div class="eyebrows">Theatre</div>
           <div class="p-large"></div>
         </div>
       </div>
     </section>
-    <section class="section">
+    <section class="section" style="border-bottom: 0px !important;">
       <p class="venue__description p-large">
        The Parlour is our most intimate venue, a refined, comfortable space designed for smaller gatherings. Seating up to 80 guests, this space is suited for intimate weddings, private dining, meetings, and smaller celebrations that call for a more personal setting than the main halls. Its warm, welcoming character and adaptable layout make it equally suited for hosting small scale events.
       </p>
     </section>
+    <section class="venue-details-section" data-venue-accordion>
+  <div class="venue-details-inner">
+    <div class="venue-details-kicker">Venue Details</div>
+
+    <div class="venue-accordion-list">
+      <div class="venue-accordion-item is-open">
+        <button class="venue-accordion-trigger" type="button" aria-expanded="true">
+          <span class="venue-accordion-number">01</span>
+          <span class="venue-accordion-title">Event Suitability</span>
+          <span class="venue-accordion-icon" aria-hidden="true"></span>
+        </button>
+
+        <div class="venue-accordion-panel">
+          <div class="venue-accordion-content">
+            <p>
+              The Parlour is suited to smaller private functions, meetings, workshops,
+              family celebrations, milestone birthdays and relaxed social gatherings.
+              It gives smaller events their own dedicated setting without the scale or
+              formality of a larger hall.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="venue-accordion-item">
+        <button class="venue-accordion-trigger" type="button" aria-expanded="false">
+          <span class="venue-accordion-number">02</span>
+          <span class="venue-accordion-title">Flexible Setup</span>
+          <span class="venue-accordion-icon" aria-hidden="true"></span>
+        </button>
+
+        <div class="venue-accordion-panel">
+          <div class="venue-accordion-content">
+            <p>
+              The room’s simple open-plan layout allows it to be arranged around the
+              needs of each event. It can be set for seated gatherings, informal standing
+              events, planning sessions, private meetings, small celebrations or a more
+              relaxed lounge-style format.
+            </p>
+
+            <div class="venue-feature-grid">
+              <div class="venue-feature">
+                <span>Format</span>
+                <strong>Flexible</strong>
+              </div>
+
+              <div class="venue-feature">
+                <span>Style</span>
+                <strong>Private</strong>
+              </div>
+
+              <div class="venue-feature">
+                <span>Best for</span>
+                <strong>Small events</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="venue-accordion-item">
+        <button class="venue-accordion-trigger" type="button" aria-expanded="false">
+          <span class="venue-accordion-number">03</span>
+          <span class="venue-accordion-title">Use With Other Spaces</span>
+          <span class="venue-accordion-icon" aria-hidden="true"></span>
+        </button>
+
+        <div class="venue-accordion-panel">
+          <div class="venue-accordion-content">
+            <p>
+              The Parlour can be booked as a standalone room or used alongside larger
+              spaces as a breakout area, preparation room, VIP lounge, green room or
+              private holding space. Its size and location make it a practical addition
+              for events that need a separate secondary room.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="venue-accordion-item">
+        <button class="venue-accordion-trigger" type="button" aria-expanded="false">
+          <span class="venue-accordion-number">04</span>
+          <span class="venue-accordion-title">Frequently Asked Questions</span>
+          <span class="venue-accordion-icon" aria-hidden="true"></span>
+        </button>
+
+        <div class="venue-accordion-panel">
+          <div class="venue-accordion-content">
+            <div class="venue-mini-faq">
+              <div>
+                <h3>Is The Parlour suitable for private events?</h3>
+                <p>
+                  Yes. The Parlour is well suited to smaller private functions, family
+                  celebrations, meetings, workshops and casual gatherings where a larger
+                  venue is not required.
+                </p>
+              </div>
+
+              <div>
+                <h3>Can it be used with The Gallery or Heritage Hall?</h3>
+                <p>
+                  Yes. The Parlour can work as an additional room for larger events,
+                  including as a breakout space, VIP area, preparation room or private
+                  support room.
+                </p>
+              </div>
+
+              <div>
+                <h3>Is it easy for guests to access?</h3>
+                <p>
+                  Yes. The Parlour is located on the lower floor and is accessed through
+                  the same main foyer area as The Gallery, making guest arrival and event
+                  flow straightforward.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="venue-details-cta">
+      <p>
+        Ready to check availability or discuss whether The Parlour is the right fit?
+      </p>
+
+      <a href="../contact.html#venue-enquiry" class="venue-details-button">
+        Enquire now
+      </a>
+    </div>
+  </div>
+  <style>
+    /* ================================
+   Croatian House Venue Accordions
+   ================================ */
+
+.venue-details-section {
+  border-bottom: 3px solid #111;
+  padding-top: 0px !important;
+  padding: clamp(72px, 8vw, 132px) clamp(24px, 5vw, 72px);
+  color: #111;
+}
+
+.venue-details-inner {
+  max-width: 1320px;
+  margin: 0 auto;
+}
+
+.venue-details-kicker {
+  font-size: 12px;
+  line-height: 1;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  margin-bottom: clamp(28px, 4vw, 54px);
+}
+
+.venue-details-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 430px);
+  gap: clamp(32px, 6vw, 96px);
+  align-items: start;
+  margin-bottom: clamp(44px, 6vw, 84px);
+}
+
+.venue-details-heading {
+  max-width: 920px;
+  margin: 0;
+  font-size: clamp(40px, 5.2vw, 92px);
+  line-height: 0.96;
+  letter-spacing: -0.055em;
+  font-weight: 400;
+}
+
+.venue-details-intro {
+  max-width: 860px;
+  margin: clamp(28px, 3vw, 44px) 0 0;
+  font-size: clamp(18px, 1.55vw, 26px);
+  line-height: 1.55;
+  letter-spacing: -0.025em;
+}
+
+.venue-details-card {
+  border: 2px solid #111;
+  padding: clamp(24px, 3vw, 36px);
+  min-height: 240px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: #fff;
+}
+
+.venue-details-card-label {
+  font-size: 12px;
+  line-height: 1;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  margin-bottom: 42px;
+}
+
+.venue-details-card-text {
+  font-size: clamp(20px, 1.8vw, 30px);
+  line-height: 1.18;
+  letter-spacing: -0.04em;
+}
+
+.venue-accordion-list {
+  border-top: 2px solid #111;
+}
+
+.venue-accordion-item {
+  border-bottom: 2px solid #111;
+}
+
+.venue-accordion-trigger {
+  width: 100%;
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  display: grid;
+  grid-template-columns: 92px 1fr 44px;
+  align-items: center;
+  gap: clamp(16px, 3vw, 42px);
+  padding: clamp(26px, 3.2vw, 44px) 0;
+  cursor: pointer;
+  text-align: left;
+}
+
+.venue-accordion-number {
+  font-size: clamp(13px, 1vw, 15px);
+  line-height: 1;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.62;
+}
+
+.venue-accordion-title {
+  font-size: clamp(30px, 4.1vw, 72px);
+  line-height: 0.95;
+  letter-spacing: -0.055em;
+  font-weight: 400;
+}
+
+.venue-accordion-icon {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  justify-self: end;
+  border: 1.5px solid #111;
+  border-radius: 999px;
+  transition: transform 320ms ease, background-color 320ms ease;
+}
+
+.venue-accordion-icon::before,
+.venue-accordion-icon::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 14px;
+  height: 1.5px;
+  background: #111;
+  transform: translate(-50%, -50%);
+  transition: transform 320ms ease, opacity 220ms ease, background-color 320ms ease;
+}
+
+.venue-accordion-icon::after {
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+
+.venue-accordion-item.is-open .venue-accordion-icon {
+  transform: rotate(180deg);
+  background: #111;
+}
+
+.venue-accordion-item.is-open .venue-accordion-icon::before,
+.venue-accordion-item.is-open .venue-accordion-icon::after {
+  background: #fff;
+}
+
+.venue-accordion-item.is-open .venue-accordion-icon::after {
+  opacity: 0;
+}
+
+.venue-accordion-panel {
+  height: 0;
+  overflow: hidden;
+  transition: height 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.venue-accordion-content {
+  padding: 0 0 clamp(34px, 4.8vw, 70px) calc(92px + clamp(16px, 3vw, 42px));
+  max-width: 1040px;
+}
+
+.venue-accordion-content p {
+  margin: 0;
+  font-size: clamp(18px, 1.65vw, 28px);
+  line-height: 1.5;
+  letter-spacing: -0.03em;
+}
+
+.venue-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border: 2px solid #111;
+  margin-top: clamp(28px, 3vw, 42px);
+}
+
+.venue-feature {
+  padding: clamp(20px, 2.5vw, 34px);
+  min-height: 150px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: #fff;
+}
+
+.venue-feature + .venue-feature {
+  border-left: 2px solid #111;
+}
+
+.venue-feature span {
+  display: block;
+  font-size: 12px;
+  line-height: 1;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.venue-feature strong {
+  display: block;
+  font-size: clamp(28px, 3.2vw, 56px);
+  line-height: 0.95;
+  letter-spacing: -0.055em;
+  font-weight: 400;
+}
+
+.venue-mini-faq {
+  display: grid;
+  gap: 30px;
+}
+
+.venue-mini-faq div {
+  border-left: 2px solid #111;
+  padding-left: clamp(18px, 2vw, 28px);
+}
+
+.venue-mini-faq h3 {
+  margin: 0 0 10px;
+  font-size: clamp(19px, 1.7vw, 28px);
+  line-height: 1.15;
+  letter-spacing: -0.035em;
+  font-weight: 400;
+}
+
+.venue-mini-faq p {
+  font-size: clamp(16px, 1.25vw, 20px);
+  line-height: 1.5;
+  letter-spacing: -0.02em;
+}
+
+.venue-details-cta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 28px;
+  border: 2px solid #111;
+  border-top: 0;
+  padding: clamp(24px, 3vw, 38px);
+  background: #fff;
+}
+
+.venue-details-cta p {
+  margin: 0;
+  max-width: 720px;
+  font-size: clamp(20px, 2vw, 34px);
+  line-height: 1.15;
+  letter-spacing: -0.04em;
+}
+
+.venue-details-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 56px;
+  padding: 0 30px;
+  border: 2px solid #111;
+  color: #111;
+  background: transparent;
+  text-decoration: none;
+  font-size: 14px;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  transition: background-color 220ms ease, color 220ms ease, transform 220ms ease;
+}
+
+.venue-details-button:hover {
+  background: #111;
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 900px) {
+  .venue-details-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .venue-details-card {
+    min-height: auto;
+  }
+
+  .venue-accordion-trigger {
+    grid-template-columns: 54px 1fr 36px;
+  }
+
+  .venue-accordion-content {
+    padding-left: 0;
+  }
+
+  .venue-feature-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .venue-feature + .venue-feature {
+    border-left: 0;
+    border-top: 2px solid #111;
+  }
+
+  .venue-details-cta {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .venue-details-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 560px) {
+  .venue-details-section {
+    padding: 58px 20px;
+  }
+
+  .venue-accordion-trigger {
+    grid-template-columns: 1fr 34px;
+    gap: 18px;
+  }
+
+  .venue-accordion-number {
+    grid-column: 1 / -1;
+    margin-bottom: -8px;
+  }
+
+  .venue-accordion-title {
+    font-size: clamp(30px, 10vw, 46px);
+  }
+}
+  </style>
+  <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const accordionRoots = document.querySelectorAll("[data-venue-accordion]");
+
+    accordionRoots.forEach(function (root) {
+      const items = Array.from(root.querySelectorAll(".venue-accordion-item"));
+
+      function closeItem(item) {
+        const trigger = item.querySelector(".venue-accordion-trigger");
+        const panel = item.querySelector(".venue-accordion-panel");
+
+        if (!trigger || !panel) return;
+
+        item.classList.remove("is-open");
+        trigger.setAttribute("aria-expanded", "false");
+        panel.style.height = panel.scrollHeight + "px";
+
+        requestAnimationFrame(function () {
+          panel.style.height = "0px";
+        });
+      }
+
+      function openItem(item) {
+        const trigger = item.querySelector(".venue-accordion-trigger");
+        const panel = item.querySelector(".venue-accordion-panel");
+
+        if (!trigger || !panel) return;
+
+        item.classList.add("is-open");
+        trigger.setAttribute("aria-expanded", "true");
+        panel.style.height = panel.scrollHeight + "px";
+
+        panel.addEventListener(
+          "transitionend",
+          function () {
+            if (item.classList.contains("is-open")) {
+              panel.style.height = "auto";
+            }
+          },
+          { once: true }
+        );
+      }
+
+      items.forEach(function (item) {
+        const trigger = item.querySelector(".venue-accordion-trigger");
+        const panel = item.querySelector(".venue-accordion-panel");
+
+        if (!trigger || !panel) return;
+
+        if (item.classList.contains("is-open")) {
+          trigger.setAttribute("aria-expanded", "true");
+          panel.style.height = "auto";
+        } else {
+          trigger.setAttribute("aria-expanded", "false");
+          panel.style.height = "0px";
+        }
+
+        trigger.addEventListener("click", function () {
+          const isOpen = item.classList.contains("is-open");
+
+          items.forEach(function (otherItem) {
+            if (otherItem !== item && otherItem.classList.contains("is-open")) {
+              closeItem(otherItem);
+            }
+          });
+
+          if (isOpen) {
+            closeItem(item);
+          } else {
+            openItem(item);
+          }
+        });
+      });
+
+      window.addEventListener("resize", function () {
+        items.forEach(function (item) {
+          const panel = item.querySelector(".venue-accordion-panel");
+          if (panel && item.classList.contains("is-open")) {
+            panel.style.height = "auto";
+          }
+        });
+      });
+    });
+  });
+</script>
+</section>
     <section class="venue__gallery w-dyn-list">
       <script type="text/x-wf-template" id="wf-template-71da585c-c3da-2886-ece2-7a36a0583b00">
           %3Cdiv%20role%3D%22listitem%22%20class%3D%22venue__gallery__img-wrp%20w-dyn-item%20w-dyn-repeater-item%22%3E%3Cimg%20src%3D%22https%3A%2F%2Fcdn.prod.website-files.com%2F64be587088306f962e4b5b46%2F666a067f004956271cdae9a0_DSC08168-Edit-min.webp%22%20loading%3D%22lazy%22%20alt%3D%22%22%20sizes%3D%22100vw%22%20srcset%3D%22https%3A%2F%2Fcdn.prod.website-files.com%2F64be587088306f962e4b5b46%2F666a067f004956271cdae9a0_DSC08168-Edit-min-p-500.webp%20500w%2C%20https%3A%2F%2Fcdn.prod.website-files.com%2F64be587088306f962e4b5b46%2F666a067f004956271cdae9a0_DSC08168-Edit-min-p-800.webp%20800w%2C%20https%3A%2F%2Fcdn.prod.website-files.com%2F64be587088306f962e4b5b46%2F666a067f004956271cdae9a0_DSC08168-Edit-min-p-1080.webp%201080w%2C%20https%3A%2F%2Fcdn.prod.website-files.com%2F64be587088306f962e4b5b46%2F666a067f004956271cdae9a0_DSC08168-Edit-min-p-1600.webp%201600w%2C%20https%3A%2F%2Fcdn.prod.website-files.com%2F64be587088306f962e4b5b46%2F666a067f004956271cdae9a0_DSC08168-Edit-min-p-2000.webp%202000w%2C%20https%3A%2F%2Fcdn.prod.website-files.com%2F64be587088306f962e4b5b46%2F666a067f004956271cdae9a0_DSC08168-Edit-min-p-2600.webp%202600w%2C%20https%3A%2F%2Fcdn.prod.website-files.com%2F64be587088306f962e4b5b46%2F666a067f004956271cdae9a0_DSC08168-Edit-min.webp%203758w%22%20class%3D%22venue__gallery__img%22%2F%3E%3C%2Fdiv%3E
