@@ -2299,7 +2299,7 @@ figure {
 .grid-cl-2__square__content {
   flex-direction: column;
   flex: 1;
-  justify-content: space-between;
+  justify-content: end;
   align-items: flex-start;
   max-width: 48ch;
   display: flex;
