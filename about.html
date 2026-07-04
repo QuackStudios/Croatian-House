@@ -36,6 +36,7 @@
 <meta name="theme-color" content="#000000" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="about/css/DidQUW6oJO5p.css" rel="stylesheet" type="text/css" crossorigin="anonymous" />
+  <link href="css/mobile-only-fixes.css" rel="stylesheet" media="(max-width: 768px)" />
   <style>
     @media (min-width: 992px) {
       html.w-mod-js:not(.w-mod-ix) [data-w-id="d71698ff-3b49-6b02-cf4f-a360c20c27b0"] {
@@ -415,7 +416,12 @@
       </div>
     </section>
     <figure id="yaw-container" class="type-on-path">
-      <img src="about/images/bcpxXxDv98yg.webp" loading="lazy" sizes="(max-width: 3713px) 100vw, 3713px" srcset="
+      <picture>
+        <source media="(max-width: 768px)" sizes="100vw" srcset="
+              about/images/2PiGMMjxIeHu.webp 800w,
+              about/images/EDo5y2lOzLJB.webp 1600w
+            " />
+        <img src="about/images/bcpxXxDv98yg.webp" loading="lazy" sizes="(max-width: 3713px) 100vw, 3713px" srcset="
             about/images/iivi55wCPnCE.webp  500w,
             about/images/2PiGMMjxIeHu.webp  800w,
             about/images/phIG4OP5NajW.webp 1080w,
@@ -425,6 +431,7 @@
             about/images/j6fKBJPVpd0K.webp 3200w,
             about/images/bcpxXxDv98yg.webp 3713w
           " alt="Yaw Asante shaking a cocktail" class="type-on-path__bg-img" />
+      </picture>
       <div class="type-on-path__embed w-embed">
         <!--?xml version="1.0" encoding="UTF-8"?--><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3713 3713">
           <path id="yaw-curve"
@@ -492,12 +499,17 @@
       </div>
     </section>
     <figure id="oyster-container" class="type-on-path">
-      <img src="about/images/oO6vvVu8uOYE.webp" loading="lazy" sizes="(max-width: 1441px) 100vw, 1441px" srcset="
+      <picture>
+        <!-- Transparent mobile fallback: the exported background layer is not present locally. -->
+        <source media="(max-width: 768px)"
+          srcset="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" />
+        <img src="about/images/oO6vvVu8uOYE.webp" loading="lazy" sizes="(max-width: 1441px) 100vw, 1441px" srcset="
             about/images/fwyiZICD3fU4.webp  500w,
             about/images/j7Lq88b8hE0J.webp  800w,
             about/images/TGfXAKjoNRsR.webp 1080w,
             about/images/oO6vvVu8uOYE.webp 1441w
           " alt="Oysters" class="type-on-path__bg-img" />
+      </picture>
       <div class="type-on-path__embed w-embed">
         <!--?xml version="1.0" encoding="UTF-8"?--><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1441 1441">
           <path id="oyster-curve"
