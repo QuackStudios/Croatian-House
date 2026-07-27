@@ -1803,14 +1803,14 @@ textarea.w-select {
   src: url(../fonts/K0PKA7kIXC7F.woff2) format("woff2");
   font-weight: 400;
   font-style: normal;
-  font-display: block;
+  font-display:swap;
 }
 @font-face {
   font-family: Suisse Intl;
   src: url(../fonts/wVwntxQNfzQO.woff2) format("woff2");
   font-weight: 400;
   font-style: normal;
-  font-display: block;
+  font-display:swap;
 }
 :root {
   --black: #121212;
