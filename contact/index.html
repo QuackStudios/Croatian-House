@@ -949,7 +949,7 @@
       }
 
       .ch-alert,
-      .ch-zapier-warning {
+      .ch-form-warning {
         display: none;
         margin-top: 24px;
         padding: 16px 18px;
@@ -963,14 +963,14 @@
         background: rgba(11, 107, 58, 0.07);
       }
 
-      .ch-zapier-warning {
+      .ch-form-warning {
         border: 1.5px solid var(--ch-error);
         color: var(--ch-error);
         background: rgba(176, 0, 32, 0.06);
       }
 
       .ch-alert.is-visible,
-      .ch-zapier-warning.is-visible {
+      .ch-form-warning.is-visible {
         display: block;
       }
 
@@ -1073,10 +1073,7 @@
           <div class="ch-progress-fill" id="chProgressFill"></div>
         </div>
 
-        <iframe id="zapierSubmissionFrame" name="zapier_hidden_iframe" class="ch-hidden"
-          title="Hidden Zapier submission frame"></iframe>
-
-        <form class="ch-form" id="croatianVenueForm" method="POST" target="zapier_hidden_iframe"
+        <form class="ch-form" id="croatianVenueForm" method="POST"
           aria-labelledby="enquiry-title" novalidate>
           <div class="ch-honeypot" aria-hidden="true">
             <label>Leave this field empty</label>
@@ -1086,7 +1083,7 @@
             <input type="text" id="company_website" name="company_website" tabindex="-1" autocomplete="off">
           </div>
 
-          <!-- Hidden fields for Zapier / HoneyBook -->
+          <!-- Hidden fields for Make / HoneyBook -->
           <input type="hidden" name="form_started_at" id="form_started_at" value="">
           <input type="hidden" name="time_on_page_seconds" id="time_on_page_seconds" value="">
           <input type="hidden" name="project_type" value="Venue Hire">
@@ -1456,12 +1453,12 @@
             back to you shortly.
           </div>
 
-          <div class="ch-zapier-warning" id="chFormError" role="alert" aria-live="assertive">
+          <div class="ch-form-warning" id="chFormError" role="alert" aria-live="assertive">
             Please check the highlighted fields and try again.
           </div>
 
-          <div class="ch-zapier-warning" id="chZapierWarning" role="alert" aria-live="assertive">
-            Add your Zapier Catch Hook URL in the JavaScript before publishing this form.
+          <div class="ch-form-warning" id="chMakeWarning" role="alert" aria-live="assertive">
+            The enquiry form is not connected. Please contact the venue team directly.
           </div>
         </form>
       </div>
@@ -1472,23 +1469,22 @@
     <script>
       (function () {
         /*
-          ZAPIER SETUP:
+          MAKE SETUP:
     
           Current flow should be:
-          1. Webhooks by Zapier → Catch Hook
-          2. Filter by Zapier → spam/basic validation gate
+          1. Make custom webhook
+          2. Spam/basic validation gate
           3. HoneyBook → Create Project
           4. Gmail → Send Email confirmation to client
         */
 
-        const ZAPIER_WEBHOOK_URL = "https://hook.eu2.make.com/0hfn92r7wuh0srxaahr5y2wbxbw3m1he";
+        const MAKE_WEBHOOK_URL = "https://hook.eu2.make.com/0hfn92r7wuh0srxaahr5y2wbxbw3m1he";
 
         const form = document.getElementById("croatianVenueForm");
         const submitButton = document.getElementById("chSubmitButton");
-        const submissionFrame = document.getElementById("zapierSubmissionFrame");
         const success = document.getElementById("chSuccess");
         const formError = document.getElementById("chFormError");
-        const zapierWarning = document.getElementById("chZapierWarning");
+        const makeWarning = document.getElementById("chMakeWarning");
         const progressFill = document.getElementById("chProgressFill");
         const charCount = document.getElementById("chCharCount");
         const consentBox = document.getElementById("consentBox");
@@ -1507,16 +1503,10 @@
         const summaryGuests = document.getElementById("summaryGuests");
 
         let formStartTimestamp = Date.now();
-        let submissionPending = false;
-        let submissionTimeout;
         let validationAttempted = false;
 
         if (formStartedAt) {
           formStartedAt.value = new Date(formStartTimestamp).toISOString();
-        }
-
-        if (form) {
-          form.action = ZAPIER_WEBHOOK_URL;
         }
 
         const requiredSelectors = [
@@ -1800,31 +1790,15 @@
           updateProgress();
         }
 
-        if (submissionFrame) {
-          submissionFrame.addEventListener("load", () => {
-            if (!submissionPending) return;
+        form.addEventListener("submit", async function (event) {
+          event.preventDefault();
 
-            submissionPending = false;
-            window.clearTimeout(submissionTimeout);
-            submitButton.disabled = false;
-            submitButton.textContent = "Submit enquiry";
-
-            if (success) {
-              success.classList.add("is-visible");
-              success.scrollIntoView({ behavior: "smooth", block: "center" });
-            }
-
-            resetFormAfterSuccess();
-          });
-        }
-
-        form.addEventListener("submit", function (event) {
           if (success) {
             success.classList.remove("is-visible");
           }
 
-          if (zapierWarning) {
-            zapierWarning.classList.remove("is-visible");
+          if (makeWarning) {
+            makeWarning.classList.remove("is-visible");
           }
 
           if (formError) {
@@ -1833,15 +1807,12 @@
           }
 
           if (
-            !ZAPIER_WEBHOOK_URL ||
-            ZAPIER_WEBHOOK_URL === "PASTE_YOUR_EXISTING_ZAPIER_WEBHOOK_URL_HERE" ||
-            ZAPIER_WEBHOOK_URL === "PASTE_YOUR_ZAPIER_CATCH_HOOK_URL_HERE"
+            !MAKE_WEBHOOK_URL ||
+            !MAKE_WEBHOOK_URL.startsWith("https://hook.")
           ) {
-            event.preventDefault();
-
-            if (zapierWarning) {
-              zapierWarning.classList.add("is-visible");
-              zapierWarning.scrollIntoView({ behavior: "smooth", block: "center" });
+            if (makeWarning) {
+              makeWarning.classList.add("is-visible");
+              makeWarning.scrollIntoView({ behavior: "smooth", block: "center" });
             }
 
             return;
@@ -1854,7 +1825,6 @@
             silently block the submission.
           */
           if (getValue("website") || getValue("company_website")) {
-            event.preventDefault();
             return;
           }
 
@@ -1862,8 +1832,6 @@
 
           validationAttempted = true;
           if (!validateForm()) {
-            event.preventDefault();
-
             const firstError = form.querySelector(".is-error");
 
             if (formError) {
@@ -1887,21 +1855,30 @@
 
           submitButton.disabled = true;
           submitButton.textContent = "Submitting...";
-          submissionPending = true;
 
-          /*
-            This submits to Zapier through the hidden iframe.
-            It avoids CORS issues and keeps the user on the page.
-    
-            The iframe load confirms that the webhook endpoint answered the browser.
-            HoneyBook project creation and the Gmail confirmation still need to be
-            monitored in Zapier because those downstream steps happen server-side.
-          */
+          const abortController = new AbortController();
+          const submissionTimeout = window.setTimeout(() => abortController.abort(), 20000);
 
-          submissionTimeout = window.setTimeout(() => {
-            if (!submissionPending) return;
+          try {
+            await fetch(MAKE_WEBHOOK_URL, {
+              method: "POST",
+              body: new FormData(form),
+              mode: "no-cors",
+              signal: abortController.signal
+            });
 
-            submissionPending = false;
+            window.clearTimeout(submissionTimeout);
+            submitButton.disabled = false;
+            submitButton.textContent = "Submit enquiry";
+
+            if (success) {
+              success.classList.add("is-visible");
+              success.scrollIntoView({ behavior: "smooth", block: "center" });
+            }
+
+            resetFormAfterSuccess();
+          } catch (error) {
+            window.clearTimeout(submissionTimeout);
             submitButton.disabled = false;
             submitButton.textContent = "Submit enquiry";
 
@@ -1911,7 +1888,9 @@
               formError.classList.add("is-visible");
               formError.scrollIntoView({ behavior: "smooth", block: "center" });
             }
-          }, 20000);
+
+            console.error("Make webhook submission failed:", error);
+          }
         });
 
         syncHiddenHoneyBookFields();
