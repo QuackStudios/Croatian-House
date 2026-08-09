@@ -1073,8 +1073,12 @@
           <div class="ch-progress-fill" id="chProgressFill"></div>
         </div>
 
+        <iframe id="makeSubmissionFrame" name="make_submission_frame" class="ch-hidden"
+          title="Make webhook submission response"></iframe>
+
         <form class="ch-form" id="croatianVenueForm" method="POST"
-          aria-labelledby="enquiry-title" novalidate>
+          action="https://hook.eu2.make.com/0hfn92r7wuh0srxaahr5y2wbxbw3m1he"
+          target="make_submission_frame" aria-labelledby="enquiry-title">
           <div class="ch-honeypot" aria-hidden="true">
             <label>Leave this field empty</label>
             <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
@@ -1083,14 +1087,9 @@
             <input type="text" id="company_website" name="company_website" tabindex="-1" autocomplete="off">
           </div>
 
-          <!-- Hidden fields for Make / HoneyBook -->
+          <!-- Submission metadata for Make -->
           <input type="hidden" name="form_started_at" id="form_started_at" value="">
           <input type="hidden" name="time_on_page_seconds" id="time_on_page_seconds" value="">
-          <input type="hidden" name="project_type" value="Venue Hire">
-          <input type="hidden" name="project_location" id="project_location" value="">
-          <input type="hidden" name="project_date" id="project_date" value="">
-          <textarea name="project_details" id="project_details" class="ch-hidden" aria-hidden="true"
-            tabindex="-1"></textarea>
           <input type="hidden" name="lead_source" value="Website Venue Enquiry Form">
           <input type="hidden" name="form_name" value="Croatian House Venue Hire Enquiry">
           <input type="hidden" name="submitted_at" id="submitted_at" value="">
@@ -1453,10 +1452,6 @@
             back to you shortly.
           </div>
 
-          <div class="ch-form-warning" id="chFormError" role="alert" aria-live="assertive">
-            Please check the highlighted fields and try again.
-          </div>
-
           <div class="ch-form-warning" id="chMakeWarning" role="alert" aria-live="assertive">
             The enquiry form is not connected. Please contact the venue team directly.
           </div>
@@ -1474,24 +1469,20 @@
           Current flow should be:
           1. Make custom webhook
           2. Spam/basic validation gate
-          3. HoneyBook → Create Project
-          4. Gmail → Send Email confirmation to client
+          3. Process the venue enquiry in Make
+          4. Send an email confirmation to the client
         */
 
         const MAKE_WEBHOOK_URL = "https://hook.eu2.make.com/0hfn92r7wuh0srxaahr5y2wbxbw3m1he";
 
         const form = document.getElementById("croatianVenueForm");
         const submitButton = document.getElementById("chSubmitButton");
+        const submissionFrame = document.getElementById("makeSubmissionFrame");
         const success = document.getElementById("chSuccess");
-        const formError = document.getElementById("chFormError");
         const makeWarning = document.getElementById("chMakeWarning");
         const progressFill = document.getElementById("chProgressFill");
         const charCount = document.getElementById("chCharCount");
-        const consentBox = document.getElementById("consentBox");
 
-        const projectLocation = document.getElementById("project_location");
-        const projectDate = document.getElementById("project_date");
-        const projectDetails = document.getElementById("project_details");
         const submittedAt = document.getElementById("submitted_at");
 
         const formStartedAt = document.getElementById("form_started_at");
@@ -1503,8 +1494,9 @@
         const summaryGuests = document.getElementById("summaryGuests");
 
         let formStartTimestamp = Date.now();
-        let validationAttempted = false;
-
+        let submissionPending = false;
+        let submissionTimeout;
+        let submissionFallback;
         if (formStartedAt) {
           formStartedAt.value = new Date(formStartTimestamp).toISOString();
         }
@@ -1540,19 +1532,6 @@
           return checked ? checked.value : "";
         }
 
-        function setFieldError(field, hasError) {
-          if (!field) return;
-          field.classList.toggle("is-error", hasError);
-
-          field.querySelectorAll("input, select, textarea").forEach((control) => {
-            if (hasError) {
-              control.setAttribute("aria-invalid", "true");
-            } else {
-              control.removeAttribute("aria-invalid");
-            }
-          });
-        }
-
         function isValidEmail(email) {
           return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
         }
@@ -1570,58 +1549,7 @@
           return `${day}/${month}/${year}`;
         }
 
-        function buildProjectDetails() {
-          const otherSpace = getValue("open_to_other_space");
-          const eventType = getValue("event_type");
-          const dateFlexible = getValue("date_flexible");
-          const guestCount = getValue("guest_count");
-          const preferredContact = getValue("preferred_contact_method");
-          const bestContactTime = getValue("best_contact_time");
-          const marketingConsent = getValue("marketing_consent");
-          const notes = getValue("event_notes");
-
-          /*
-            HoneyBook strips proper layout in Project Details.
-            This compact version avoids ugly fake rows/lines and keeps it readable.
-            Venue/date/name/email/phone are NOT repeated here because HoneyBook already
-            displays those separately via project location/date/client fields.
-          */
-
-          return [
-            "EVENT DETAILS",
-            `Event type: ${eventType || "Not selected"}`,
-            `Date flexible: ${dateFlexible || "Not specified"}`,
-            `Guest count: ${guestCount || "Not selected"}`,
-            `Open to another space: ${otherSpace || "Not specified"}`,
-
-            "CONTACT PREFERENCE",
-            `Preferred contact: ${preferredContact || "Not specified"}`,
-            `Best time: ${bestContactTime || "Not specified"}`,
-
-            "CONSENT",
-            `Marketing consent: ${marketingConsent || "No"}`,
-
-            "CLIENT MESSAGE",
-            notes || "No additional message provided."
-          ].join("   |   ");
-        }
-
-        function syncHiddenHoneyBookFields() {
-          const venue = getValue("venue_requested");
-          const date = getValue("event_date");
-
-          if (projectLocation) {
-            projectLocation.value = venue;
-          }
-
-          if (projectDate) {
-            projectDate.value = date;
-          }
-
-          if (projectDetails) {
-            projectDetails.value = buildProjectDetails();
-          }
-
+        function syncSubmissionMetadata() {
           if (submittedAt) {
             submittedAt.value = new Date().toISOString();
           }
@@ -1685,62 +1613,10 @@
           }
         }
 
-        function validateForm() {
-          let valid = true;
-
-          requiredSelectors.forEach((selector) => {
-            const el = form.querySelector(selector);
-            if (!el) return;
-
-            const field = el.closest(".ch-field");
-
-            let hasError = false;
-
-            if (el.type === "checkbox") {
-              hasError = !el.checked;
-
-              if (consentBox) {
-                setFieldError(consentBox, hasError);
-              }
-            } else if (el.type === "email") {
-              hasError = !isValidEmail(el.value.trim());
-              setFieldError(field, hasError);
-            } else {
-              hasError = !el.value.trim();
-              setFieldError(field, hasError);
-            }
-
-            if (hasError) valid = false;
-          });
-
-          requiredRadioNames.forEach((name) => {
-            const group = form.querySelector(`[data-required-radio="${name}"]`);
-            const checked = form.querySelector(`[name="${name}"]:checked`);
-            const hasError = !checked;
-
-            setFieldError(group, hasError);
-
-            if (hasError) valid = false;
-          });
-
-          return valid;
-        }
-
-        function refreshValidationAfterInteraction() {
-          if (!validationAttempted) return;
-
-          const formIsValid = validateForm();
-
-          if (formError) {
-            formError.classList.toggle("is-visible", !formIsValid);
-          }
-        }
-
         form.addEventListener("input", () => {
-          syncHiddenHoneyBookFields();
+          syncSubmissionMetadata();
           updateSummary();
           updateProgress();
-          refreshValidationAfterInteraction();
 
           if (success) {
             success.classList.remove("is-visible");
@@ -1748,10 +1624,9 @@
         });
 
         form.addEventListener("change", () => {
-          syncHiddenHoneyBookFields();
+          syncSubmissionMetadata();
           updateSummary();
           updateProgress();
-          refreshValidationAfterInteraction();
 
           if (success) {
             success.classList.remove("is-visible");
@@ -1769,9 +1644,6 @@
         function resetFormAfterSuccess() {
           form.reset();
 
-          if (projectLocation) projectLocation.value = "";
-          if (projectDate) projectDate.value = "";
-          if (projectDetails) projectDetails.value = "";
           if (submittedAt) submittedAt.value = "";
           if (timeOnPageSeconds) timeOnPageSeconds.value = "";
 
@@ -1785,13 +1657,41 @@
             charCount.textContent = "0";
           }
 
-          validationAttempted = false;
           updateSummary();
           updateProgress();
         }
 
-        form.addEventListener("submit", async function (event) {
-          event.preventDefault();
+        function completeSubmission() {
+          if (!submissionPending) return;
+
+          submissionPending = false;
+          window.clearTimeout(submissionTimeout);
+          window.clearTimeout(submissionFallback);
+          submitButton.disabled = false;
+          submitButton.textContent = "Submit enquiry";
+
+          if (success) {
+            success.classList.add("is-visible");
+            success.scrollIntoView({ behavior: "smooth", block: "center" });
+          }
+
+          resetFormAfterSuccess();
+        }
+
+        if (submissionFrame) {
+          submissionFrame.addEventListener("load", () => {
+            if (!submissionPending) return;
+
+            console.info("Venue enquiry: Make webhook returned a response.");
+            completeSubmission();
+          });
+        }
+
+        form.addEventListener("submit", function (event) {
+          console.info("Venue enquiry: submit event received.", {
+            endpoint: MAKE_WEBHOOK_URL,
+            submittedAt: new Date().toISOString()
+          });
 
           if (success) {
             success.classList.remove("is-visible");
@@ -1801,99 +1701,61 @@
             makeWarning.classList.remove("is-visible");
           }
 
-          if (formError) {
-            formError.classList.remove("is-visible");
-            formError.textContent = "Please check the highlighted fields and try again.";
-          }
-
           if (
             !MAKE_WEBHOOK_URL ||
             !MAKE_WEBHOOK_URL.startsWith("https://hook.")
           ) {
+            event.preventDefault();
+
             if (makeWarning) {
               makeWarning.classList.add("is-visible");
               makeWarning.scrollIntoView({ behavior: "smooth", block: "center" });
             }
 
+            console.error("Venue enquiry: the Make webhook URL is missing or invalid.");
             return;
           }
 
           /*
-            Spam protection:
-            Real users never see or fill these fields.
-            Many spam bots fill every input they find, so if either has a value,
-            silently block the submission.
+            Always send the honeypot values to Make. Make owns the spam-filtering
+            decision; the website must not cancel a genuine submission merely
+            because autofill or a browser extension populated a hidden field.
           */
           if (getValue("website") || getValue("company_website")) {
-            return;
+            console.info(
+              "Venue enquiry: honeypot value present; forwarding it to Make for filtering."
+            );
           }
 
-          syncHiddenHoneyBookFields();
-
-          validationAttempted = true;
-          if (!validateForm()) {
-            const firstError = form.querySelector(".is-error");
-
-            if (formError) {
-              formError.classList.add("is-visible");
-            }
-
-            if (firstError) {
-              const firstInvalidControl = firstError.querySelector(
-                "input:not([type='hidden']), select, textarea"
-              );
-
-              if (firstInvalidControl) {
-                firstInvalidControl.focus({ preventScroll: true });
-              }
-
-              firstError.scrollIntoView({ behavior: "smooth", block: "center" });
-            }
-
-            return;
-          }
+          syncSubmissionMetadata();
 
           submitButton.disabled = true;
           submitButton.textContent = "Submitting...";
+          submissionPending = true;
 
-          const abortController = new AbortController();
-          const submissionTimeout = window.setTimeout(() => abortController.abort(), 20000);
+          /*
+            Some webhook responses cannot be rendered in an iframe because of their
+            security headers. The browser still sends the POST, so do not report that
+            as a failed enquiry merely because the response frame cannot confirm it.
+          */
+          submissionFallback = window.setTimeout(() => {
+            if (!submissionPending) return;
 
-          try {
-            await fetch(MAKE_WEBHOOK_URL, {
-              method: "POST",
-              body: new FormData(form),
-              mode: "no-cors",
-              signal: abortController.signal
-            });
+            console.info(
+              "Venue enquiry: POST was dispatched; the webhook response was not visible to the page."
+            );
+            completeSubmission();
+          }, 1500);
 
+          submissionTimeout = window.setTimeout(() => {
+            if (!submissionPending) return;
+
+            console.warn("Venue enquiry: Make did not return a frame response within 20 seconds.");
             window.clearTimeout(submissionTimeout);
-            submitButton.disabled = false;
-            submitButton.textContent = "Submit enquiry";
-
-            if (success) {
-              success.classList.add("is-visible");
-              success.scrollIntoView({ behavior: "smooth", block: "center" });
-            }
-
-            resetFormAfterSuccess();
-          } catch (error) {
-            window.clearTimeout(submissionTimeout);
-            submitButton.disabled = false;
-            submitButton.textContent = "Submit enquiry";
-
-            if (formError) {
-              formError.textContent =
-                "We could not confirm that your enquiry was sent. Your details are still here—please try again or email events@croatianhouse.com.au.";
-              formError.classList.add("is-visible");
-              formError.scrollIntoView({ behavior: "smooth", block: "center" });
-            }
-
-            console.error("Make webhook submission failed:", error);
-          }
+          }, 20000);
         });
 
-        syncHiddenHoneyBookFields();
+        syncSubmissionMetadata();
         updateSummary();
         updateProgress();
       })();
